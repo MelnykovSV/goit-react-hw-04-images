@@ -18,10 +18,8 @@ export const Modal = ({
   const [showLoader, setShowLoader] = useState(true);
 
   const keyDownHandler = (e: KeyboardEvent) => {
-    if (e.keyCode === 27) {
+    if (e.code === 'Escape') {
       modalCloseHandler();
-    } else {
-      console.log('listener');
     }
   };
 

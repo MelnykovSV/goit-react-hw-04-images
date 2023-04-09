@@ -1,11 +1,14 @@
-import { IImageGalleryProps } from '../../interfaces'
-import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem'
-import { Container } from './ImageGallery.styled'
+import { IImageGalleryProps } from '../../interfaces';
+import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
+import { Container } from './ImageGallery.styled';
 
-export const ImageGallery = ({ picsToRender, imageClickHandler }: IImageGalleryProps) => {
+export const ImageGallery = ({
+  picsToRender,
+  imageClickHandler,
+}: IImageGalleryProps) => {
   return (
-    <Container className='gallery'>
-      {picsToRender.map((item) => {
+    <Container className="gallery">
+      {picsToRender.map(item => {
         return (
           <ImageGalleryItem
             webformatURL={item.webformatURL}
@@ -14,8 +17,8 @@ export const ImageGallery = ({ picsToRender, imageClickHandler }: IImageGalleryP
             imageClickHandler={imageClickHandler}
             key={item.id}
           />
-        )
+        );
       })}
     </Container>
-  )
-}
+  );
+};

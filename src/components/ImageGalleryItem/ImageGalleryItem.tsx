@@ -1,20 +1,20 @@
-import React from 'react'
-import { IImageGalleryItemProps } from '../../interfaces'
-import { Container } from './ImageGalleryItem.styled'
+import React from 'react';
+import { IImageGalleryItemProps } from '../../interfaces';
+import { Container } from './ImageGalleryItem.styled';
 
-export class ImageGalleryItem extends React.Component<Readonly<IImageGalleryItemProps>> {
-  state = {
-    largeImageURL: this.props.largeImageURL,
-  }
+export const ImageGalleryItem = ({
+  webformatURL,
+  tags,
+  largeImageURL,
+  imageClickHandler,
+}: IImageGalleryItemProps) => {
+  const imageUrlDetector = () => {
+    imageClickHandler(largeImageURL, tags);
+  };
 
-  imageUrlDetector = () => {
-    this.props.imageClickHandler(this.state.largeImageURL, this.props.tags)
-  }
-  render() {
-    return (
-      <Container className='gallery-item' onClick={this.imageUrlDetector}>
-        <img src={this.props.webformatURL} alt={this.props.tags} />
-      </Container>
-    )
-  }
-}
+  return (
+    <Container className="gallery-item" onClick={imageUrlDetector}>
+      <img src={webformatURL} alt={tags} />
+    </Container>
+  );
+};
