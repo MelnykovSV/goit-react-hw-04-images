@@ -20,6 +20,8 @@ export const Modal = ({
   const keyDownHandler = (e: KeyboardEvent) => {
     if (e.keyCode === 27) {
       modalCloseHandler();
+    } else {
+      console.log('listener');
     }
   };
 
@@ -30,15 +32,19 @@ export const Modal = ({
     }
   };
 
-  useEffect((): void => {
-    document.addEventListener('keydown', keyDownHandler);
-  }, []);
-
   useEffect(() => {
+    document.addEventListener('keydown', keyDownHandler);
     return () => {
       document.removeEventListener('keydown', keyDownHandler);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // useEffect(() => {
+  //   return () => {
+  //     document.removeEventListener('keydown', keyDownHandler);
+  //   };
+  // }, []);
 
   return createPortal(
     <Container onClick={clickHandler}>
