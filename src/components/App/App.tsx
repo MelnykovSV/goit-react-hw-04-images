@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import { PICS_PER_PAGE, URL_BASE } from '../../constants';
-import { IImageData, IServerResponseData } from '../../interfaces';
+import { PICS_PER_PAGE } from '../../constants';
+import { IImageData } from '../../interfaces';
 
 import { Searchbar } from '../Searchbar/Searchbar';
 import { Button } from '../Button/Button';
@@ -10,6 +10,15 @@ import { Modal } from '../Modal/Modal';
 import { Footer } from '../Footer/Footer';
 import { ErrorComponent } from '../ErrorComponent/ErrorComponent';
 import { Dna } from 'react-loader-spinner';
+
+import { IfetchResults } from '../../interfaces';
+import { fetchPics } from '../../api';
+
+import {
+  countTotalHits,
+  imageDataPurifier,
+  scrollBottomDirection,
+} from '../../helpers';
 
 import { Container } from './App.styled';
 
@@ -28,16 +37,8 @@ export const App = () => {
 
   useEffect(() => {
     if (searchInput) {
-      fetchPics().then(data => {
-        if (data) {
-          const purifiedData = data.hits.map(
-            ({ id, largeImageURL, webformatURL, tags }) => {
-              return { id, largeImageURL, webformatURL, tags };
-            }
-          );
-          // this.setState({ picsToRender: purifiedData });
-          setPicsToRender(purifiedData);
-        }
+      fetchPics(searchInput, page).then(data => {
+        serverResponseHandler(data, 'initial');
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,13 +48,8 @@ export const App = () => {
 
   useEffect(() => {
     if (page !== 1) {
-      fetchPics().then(data => {
-        if (data) {
-          setPicsToRender((prevState: IImageData[]) => [
-            ...prevState,
-            ...data.hits,
-          ]);
-        }
+      fetchPics(searchInput, page).then(data => {
+        serverResponseHandler(data, 'following');
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,72 +58,45 @@ export const App = () => {
   //   // Scrolls to bottom after new portion of pictures rendered after click on "Get more"
 
   useEffect(() => {
-    scrollToBottom();
+    scrollBottomDirection();
   }, [picsToRender]);
 
   //   // Opens modal by click on the picture
 
   useEffect(() => {
     if (modalURL !== '') {
-      // this.setState({ isModalOpen: true });
       setIsModalOpen(true);
     }
   }, [modalURL]);
 
-  //// Method to fetch pictures
-  const fetchPics = async (): Promise<Readonly<IServerResponseData | void>> => {
-    setStatus('pending');
-    try {
-      const response = await fetch(
-        `${URL_BASE}&q=${searchInput}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${PICS_PER_PAGE}&page=${page}`
-      );
-      if (response.ok) {
-        setError(null);
-        const data = await response.json();
-        checkTotalHits(data);
-        return data;
-      } else {
-        Promise.reject(new Error('Something went wrong!'));
-      }
-    } catch (error) {
-      setStatus('rejected');
-      setError(error as string);
-
-      throw error;
-    } finally {
+  const serverResponseHandler = (
+    { data, error }: IfetchResults,
+    handleType: 'initial' | 'following'
+  ) => {
+    if (data) {
       setStatus('resolved');
-    }
-  };
+      setError(null);
 
-  //// Method to count a real number of hits from pixabay
-
-  const checkTotalHits = (serverResponse: Readonly<IServerResponseData>) => {
-    if (serverResponse.hits.length !== 0) {
-      if (serverResponse.totalHits >= 500) {
-        if (
-          serverResponse.total <
-          PICS_PER_PAGE * Math.ceil(500 / PICS_PER_PAGE)
-        ) {
-          setTotalHits(serverResponse.total);
-
-          return;
-        }
-
-        setTotalHits(PICS_PER_PAGE * Math.ceil(500 / PICS_PER_PAGE));
-
-        return;
+      switch (handleType) {
+        case 'initial':
+          setTotalHits(countTotalHits(data));
+          setPicsToRender(imageDataPurifier(data.hits));
+          break;
+        case 'following':
+          setPicsToRender((prevState: IImageData[]) => [
+            ...prevState,
+            ...imageDataPurifier(data.hits),
+          ]);
       }
-
-      setTotalHits(serverResponse.totalHits);
-
-      return;
+    } else {
+      setStatus('rejected');
+      setError(error);
+      setTotalHits(0);
+      setPicsToRender([]);
     }
-
-    console.log(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-    setTotalHits(0);
   };
+
+  // const serverResponseHandler = ({ data, error }: IfetchResults) => {};
 
   const incrementPages = () => {
     setPage(prevState => prevState + 1);
@@ -145,30 +114,17 @@ export const App = () => {
     setModalURL(imageURL);
     setModalTags(tags);
   };
+
   const handleModalClose = (): void => {
     setModalURL('');
     setModalTags('');
     setIsModalOpen(false);
   };
 
-  const scrollToBottom = () => {
-    window.scrollBy({
-      top: 260 * 2,
-      behavior: 'smooth',
-    });
-  };
-
   /// IDLE
   if (status === 'idle') {
     return (
       <Container>
-        {isModalOpen && (
-          <Modal
-            modalCloseHandler={handleModalClose}
-            largeImageUrl={modalURL}
-            imageTags={modalTags}
-          ></Modal>
-        )}
         <Searchbar submitHandler={handleFormSubmit} />
       </Container>
     );
