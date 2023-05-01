@@ -38,12 +38,6 @@ export const Modal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   return () => {
-  //     document.removeEventListener('keydown', keyDownHandler);
-  //   };
-  // }, []);
-
   return createPortal(
     <Container onClick={clickHandler}>
       <div>
