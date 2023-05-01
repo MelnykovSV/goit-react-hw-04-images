@@ -38,6 +38,8 @@ export const Modal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  ///some new text
+
   return createPortal(
     <Container onClick={clickHandler}>
       <div>
