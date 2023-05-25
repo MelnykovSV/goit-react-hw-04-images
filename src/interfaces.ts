@@ -69,7 +69,3 @@ export interface IfetchResults {
   data: IServerResponseData | null;
   error: null | string;
 }
-
-// export interface Imyref {
-//   current: { scrollIntoView: ({behavior: string; block: string; inline: string}) => void } | null
-// }

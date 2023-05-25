@@ -96,8 +96,6 @@ export const App = () => {
     }
   };
 
-  // const serverResponseHandler = ({ data, error }: IfetchResults) => {};
-
   const incrementPages = () => {
     setPage(prevState => prevState + 1);
   };
@@ -131,7 +129,7 @@ export const App = () => {
   }
 
   /// PENDING
-  else if (status === 'pending') {
+  if (status === 'pending') {
     return (
       <Container>
         {isModalOpen && (
@@ -154,7 +152,7 @@ export const App = () => {
   }
 
   /// RESOLVED
-  else if (status === 'resolved') {
+  if (status === 'resolved') {
     return (
       <Container>
         {isModalOpen && (
@@ -184,7 +182,7 @@ export const App = () => {
   }
 
   /// REJECTED
-  else if (status === 'rejected') {
+  if (status === 'rejected') {
   }
   return (
     <Container>
